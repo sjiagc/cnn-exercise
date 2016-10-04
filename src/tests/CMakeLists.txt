@@ -7,6 +7,8 @@ set(SOURCES
     InnerProductLayerTests.hpp
     DimensionTests.cpp
     DimensionTests.hpp
+    LeNetClassification.cpp
+    LeNetClassification.hpp
     MatrixTests.cpp
     MatrixTests.hpp
     PoolingLayerTests.cpp

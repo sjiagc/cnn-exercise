@@ -94,6 +94,8 @@ public:
     void setZ(int64_t inZ) { m_dim[2] = inZ; }
     void setW(int64_t inW) { m_dim[3] = inW; }
 
+    int64_t count() const { return getX() * getY() * getZ() * getW(); }
+
 private:
     int64_t m_dim[4];
 };

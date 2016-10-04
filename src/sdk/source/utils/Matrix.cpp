@@ -71,7 +71,7 @@ Matrix<TDataType>::operator = (const Matrix<TDataType> &inArg)
 {
     if (m_dimension != inArg.m_dimension)
         throw std::runtime_error("Matrix::operator=: dimension not match");
-    m_dimension = inArg.m_dimension;
+    //m_dimension = inArg.m_dimension;
     m_startDimension = inArg.m_startDimension;
     m_stride = inArg.m_stride;
     m_data = inArg.m_data;
@@ -110,6 +110,28 @@ template<typename TDataType>
 bool
 Matrix<TDataType>::reshape(const Dimension &inDimension)
 {
+    if (inDimension.count() == m_dimension.count()) {
+        TDataType *theNewData = new TDataType[inDimension.getX() * inDimension.getY() * inDimension.getZ() * inDimension.getW()];
+        int64_t theNewDataIndex = 0;
+        for (int64_t w = 0, theWCount = m_dimension.getW(); w < theWCount; ++w) {
+            for (int64_t z = 0, theZCount = m_dimension.getZ(); z < theZCount; ++z) {
+                for (int64_t y = 0, theYCount = m_dimension.getY(); y < theYCount; ++y) {
+                    for (int64_t x = 0, theXCount = m_dimension.getX(); x < theXCount; ++x) {
+                        theNewData[theNewDataIndex++] = (&*m_data)[offset(x, y, z, w)];
+                    }
+                }
+            }
+        }
+
+        m_data.reset(theNewData, [](TDataType *p) -> void { delete[] p; });
+        m_dimension  = inDimension;
+        m_startDimension = 0;
+        m_stride = Dimension(1,
+                             m_dimension.getX(),
+                             m_dimension.getX() * m_dimension.getY(),
+                             m_dimension.getX() * m_dimension.getY() * m_dimension.getZ());
+        return true;
+    }
     return false;
 }
 

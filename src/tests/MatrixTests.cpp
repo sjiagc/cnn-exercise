@@ -121,6 +121,28 @@ sub1()
     return true;
 }
 
+bool
+reshape()
+{
+    Dimension theOriginDim(3, 5);
+    Dimension theReshapedDim(5, 3);
+
+    Matrix<double> theOrigin(theOriginDim);
+    fillMatrix(theOrigin);
+    Matrix<double> theReshaped(theOrigin);
+    theReshaped.reshape(theReshapedDim);
+    Matrix<double>::data_type *theReshapedData = theReshaped.getData();
+    if (theReshapedData[theReshaped.offset(0,0)] != 0 ||
+            theReshapedData[theReshaped.offset(3, 2)] != 41 ||
+            theReshapedData[theReshaped.offset(2, 1)] != 21) {
+        std::cerr << "Matrix.reshape test failed. origin matrix: " << std::endl
+                  << theOrigin << std::endl
+                  << "reshaped matrix:" << std::endl
+                  << theReshaped << std::endl;
+        return false;
+    }
+    return true;
+}
 }
 
 namespace test
@@ -134,6 +156,7 @@ MatrixTests::run()
     offset3();
     offset4();
     sub1();
+    reshape();
 }
 
 }

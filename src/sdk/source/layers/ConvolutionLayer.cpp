@@ -92,7 +92,7 @@ ConvolutionLayer<TDataType>::restore(const TDataRestoring &inStoredData)
         const utils::Matrix<TDataType> *theWeights = inStoredData.find(RESTORE_WEIGHTS)->second;
         if (theWeights) {
             if (theWeights->getDimension() != m_weights->getDimension())
-                throw std::runtime_error("ConvolutionLayer:restore: weights dimensions do not match");
+                throw std::runtime_error("ConvolutionLayer::restore: weights dimensions do not match");
             *m_weights = *theWeights;
         }
     }
@@ -100,7 +100,7 @@ ConvolutionLayer<TDataType>::restore(const TDataRestoring &inStoredData)
         const utils::Matrix<TDataType> *theBias= inStoredData.find(RESTORE_BIAS)->second;
         if (theBias) {
             if (theBias->getDimension() != m_bias->getDimension())
-                throw std::runtime_error("ConvolutionLayer:restore: bias dimensions do not match");
+                throw std::runtime_error("ConvolutionLayer::restore: bias dimensions do not match");
             *m_bias = *theBias;
         }
     }
