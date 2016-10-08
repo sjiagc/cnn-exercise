@@ -29,6 +29,20 @@ SoftMaxLayer<TDataType>::getType()
 
 template<typename TDataType>
 void
+SoftMaxLayer<TDataType>::setMode(ComputeModeEnum inMode)
+{
+    (void)inMode;
+}
+
+template<typename TDataType>
+ComputeModeEnum
+SoftMaxLayer<TDataType>::getMode()
+{
+    return ComputeModeEnum::CPU;
+}
+
+template<typename TDataType>
+void
 SoftMaxLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 {
     inDescendentLayer.setForwardInput(*getOutput());
@@ -47,7 +61,7 @@ void
 SoftMaxLayer<TDataType>::forward()
 {
     const utils::Dimension &theSrcDim = m_input->getDimension();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getData();
+    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
     const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
 
     // Get max value

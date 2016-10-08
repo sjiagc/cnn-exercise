@@ -4,6 +4,7 @@
 #include <Layer.hpp>
 #include <layers/InnerProductLayer.hpp>
 
+#include "ConstInputLayer.hpp"
 #include "PrintUtils.hpp"
 
 #include <stdexcept>
@@ -22,7 +23,7 @@ void
 fillMatrix(Matrix<TDataType> &inMatrix)
 {
     const Dimension &theMatrixDim = inMatrix.getDimension();
-    Matrix<TDataType>::data_type *theData = inMatrix.getData();
+    Matrix<TDataType>::data_type *theData = inMatrix.getMutableData();
     for (int64_t w = 0; w < theMatrixDim.getW(); ++w) {
         for (int64_t z = 0; z < theMatrixDim.getZ(); ++z) {
             for (int64_t y = 0; y < theMatrixDim.getY(); ++y) {
@@ -33,30 +34,6 @@ fillMatrix(Matrix<TDataType> &inMatrix)
         }
     }
 }
-
-template<typename TDataType>
-class InputLayer: public layer::Layer<TDataType>
-{
-public:
-    InputLayer(const Matrix<TDataType> &inInput): m_input(inInput) {}
-
-    virtual const char* getType() { return "input"; }
-    virtual void connect(layer::Layer<TDataType> &inDescendentLayer) override
-    {
-        inDescendentLayer.setForwardInput(m_input);
-    }
-    virtual void restore(const TDataRestoring &inStoredData) override {}
-    virtual void forward() override {}
-    virtual void backward() override {}
-    virtual const Matrix<TDataType>* getOutput() const override { return &m_input; }
-    virtual const Matrix<TDataType>* getDiff() const override { return nullptr; }
-
-private:
-    virtual void setForwardInput(const Matrix<TDataType> &inInput) override {}
-    virtual void setBackwardDiff(const Matrix<TDataType> &inDiff) override {}
-
-    const Matrix<TDataType> &m_input;
-};
 
 bool
 innerProduct1D()
@@ -69,28 +46,28 @@ innerProduct1D()
     fillMatrix(theInput);
 
     {
-        theWeights.getData()[theWeights.offset(0)] = 1;
-        theWeights.getData()[theWeights.offset(1)] = 2;
-        theWeights.getData()[theWeights.offset(2)] = 1;
-        theWeights.getData()[theWeights.offset(3)] = 3;
-        theWeights.getData()[theWeights.offset(4)] = 1;
-        theWeights.getData()[theWeights.offset(5)] = 4;
-        theWeights.getData()[theWeights.offset(6)] = 1;
-        theWeights.getData()[theWeights.offset(7)] = 5;
-        theWeights.getData()[theWeights.offset(8)] = 1;
+        theWeights.getMutableData()[theWeights.offset(0)] = 1;
+        theWeights.getMutableData()[theWeights.offset(1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(2)] = 1;
+        theWeights.getMutableData()[theWeights.offset(3)] = 3;
+        theWeights.getMutableData()[theWeights.offset(4)] = 1;
+        theWeights.getMutableData()[theWeights.offset(5)] = 4;
+        theWeights.getMutableData()[theWeights.offset(6)] = 1;
+        theWeights.getMutableData()[theWeights.offset(7)] = 5;
+        theWeights.getMutableData()[theWeights.offset(8)] = 1;
 
-        theWeights.getData()[theWeights.offset(0, 1)] = 2;
-        theWeights.getData()[theWeights.offset(1, 1)] = 3;
-        theWeights.getData()[theWeights.offset(2, 1)] = 2;
-        theWeights.getData()[theWeights.offset(3, 1)] = 4;
-        theWeights.getData()[theWeights.offset(4, 1)] = 2;
-        theWeights.getData()[theWeights.offset(5, 1)] = 5;
-        theWeights.getData()[theWeights.offset(6, 1)] = 2;
-        theWeights.getData()[theWeights.offset(7, 1)] = 6;
-        theWeights.getData()[theWeights.offset(8, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(0, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(1, 1)] = 3;
+        theWeights.getMutableData()[theWeights.offset(2, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(3, 1)] = 4;
+        theWeights.getMutableData()[theWeights.offset(4, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(5, 1)] = 5;
+        theWeights.getMutableData()[theWeights.offset(6, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(7, 1)] = 6;
+        theWeights.getMutableData()[theWeights.offset(8, 1)] = 2;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theIPConfig;
     theIPConfig.insert(std::make_pair(std::string(layer::InnerProductLayer<double>::CONFIG_NUM_OUTPUT), "2"));
     layer::Layer<double>::TUniqueHandle theIPLayer(layer::Layer<double>::create(layer::InnerProductLayer<double>::TYPE, theIPConfig));
@@ -129,7 +106,7 @@ innerProduct2D()
     fillMatrix(theInput);
     fillMatrix(theWeights);
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theIPConfig;
     theIPConfig.insert(std::make_pair(std::string(layer::InnerProductLayer<double>::CONFIG_NUM_OUTPUT), "2"));
     layer::Layer<double>::TUniqueHandle theIPLayer(layer::Layer<double>::create(layer::InnerProductLayer<double>::TYPE, theIPConfig));
@@ -168,7 +145,7 @@ innerProduct3D()
     fillMatrix(theInput);
     fillMatrix(theWeights);
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theIPConfig;
     theIPConfig.insert(std::make_pair(std::string(layer::InnerProductLayer<double>::CONFIG_NUM_OUTPUT), "2"));
     layer::Layer<double>::TUniqueHandle theIPLayer(layer::Layer<double>::create(layer::InnerProductLayer<double>::TYPE, theIPConfig));
@@ -208,31 +185,31 @@ innerProduct1DBias()
     fillMatrix(theInput);
 
     {
-        theWeights.getData()[theWeights.offset(0)] = 1;
-        theWeights.getData()[theWeights.offset(1)] = 2;
-        theWeights.getData()[theWeights.offset(2)] = 1;
-        theWeights.getData()[theWeights.offset(3)] = 3;
-        theWeights.getData()[theWeights.offset(4)] = 1;
-        theWeights.getData()[theWeights.offset(5)] = 4;
-        theWeights.getData()[theWeights.offset(6)] = 1;
-        theWeights.getData()[theWeights.offset(7)] = 5;
-        theWeights.getData()[theWeights.offset(8)] = 1;
+        theWeights.getMutableData()[theWeights.offset(0)] = 1;
+        theWeights.getMutableData()[theWeights.offset(1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(2)] = 1;
+        theWeights.getMutableData()[theWeights.offset(3)] = 3;
+        theWeights.getMutableData()[theWeights.offset(4)] = 1;
+        theWeights.getMutableData()[theWeights.offset(5)] = 4;
+        theWeights.getMutableData()[theWeights.offset(6)] = 1;
+        theWeights.getMutableData()[theWeights.offset(7)] = 5;
+        theWeights.getMutableData()[theWeights.offset(8)] = 1;
 
-        theWeights.getData()[theWeights.offset(0, 1)] = 2;
-        theWeights.getData()[theWeights.offset(1, 1)] = 3;
-        theWeights.getData()[theWeights.offset(2, 1)] = 2;
-        theWeights.getData()[theWeights.offset(3, 1)] = 4;
-        theWeights.getData()[theWeights.offset(4, 1)] = 2;
-        theWeights.getData()[theWeights.offset(5, 1)] = 5;
-        theWeights.getData()[theWeights.offset(6, 1)] = 2;
-        theWeights.getData()[theWeights.offset(7, 1)] = 6;
-        theWeights.getData()[theWeights.offset(8, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(0, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(1, 1)] = 3;
+        theWeights.getMutableData()[theWeights.offset(2, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(3, 1)] = 4;
+        theWeights.getMutableData()[theWeights.offset(4, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(5, 1)] = 5;
+        theWeights.getMutableData()[theWeights.offset(6, 1)] = 2;
+        theWeights.getMutableData()[theWeights.offset(7, 1)] = 6;
+        theWeights.getMutableData()[theWeights.offset(8, 1)] = 2;
 
-        theBias.getData()[theBias.offset(0)] = 1;
-        theBias.getData()[theBias.offset(1)] = 2.2;
+        theBias.getMutableData()[theBias.offset(0)] = 1;
+        theBias.getMutableData()[theBias.offset(1)] = 2.2;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theIPConfig;
     theIPConfig.insert(std::make_pair(std::string(layer::InnerProductLayer<double>::CONFIG_NUM_OUTPUT), "2"));
     theIPConfig.insert(std::make_pair(std::string(layer::InnerProductLayer<double>::CONFIG_BIAS_TERM), "true"));

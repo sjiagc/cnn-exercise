@@ -2,6 +2,7 @@
 
 #include <layers/ReluLayer.hpp>
 
+#include "ConstInputLayer.hpp"
 #include "PrintUtils.hpp"
 
 #include <iostream>
@@ -19,7 +20,7 @@ void
 fillMatrix(Matrix<TDataType> &inMatrix)
 {
     const Dimension &theMatrixDim = inMatrix.getDimension();
-    Matrix<TDataType>::data_type *theData = inMatrix.getData();
+    Matrix<TDataType>::data_type *theData = inMatrix.getMutableData();
     for (int64_t w = 0; w < theMatrixDim.getW(); ++w) {
         for (int64_t z = 0; z < theMatrixDim.getZ(); ++z) {
             for (int64_t y = 0; y < theMatrixDim.getY(); ++y) {
@@ -31,30 +32,6 @@ fillMatrix(Matrix<TDataType> &inMatrix)
     }
 }
 
-template<typename TDataType>
-class InputLayer: public layer::Layer<TDataType>
-{
-public:
-    InputLayer(const Matrix<TDataType> &inInput): m_input(inInput) {}
-
-    virtual const char* getType() { return "input"; }
-    virtual void connect(layer::Layer<TDataType> &inDescendentLayer) override
-    {
-        inDescendentLayer.setForwardInput(m_input);
-    }
-    virtual void restore(const TDataRestoring &inStoredData) override {}
-    virtual void forward() override {}
-    virtual void backward() override {}
-    virtual const Matrix<TDataType>* getOutput() const override { return &m_input; }
-    virtual const Matrix<TDataType>* getDiff() const override { return nullptr; }
-
-private:
-    virtual void setForwardInput(const Matrix<TDataType> &inInput) override {}
-    virtual void setBackwardDiff(const Matrix<TDataType> &inDiff) override {}
-
-    const Matrix<TDataType> &m_input;
-};
-
 bool
 reluDefault()
 {
@@ -64,7 +41,7 @@ reluDefault()
 
     fillMatrix(theInput);
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TUniqueHandle theReluLayer(layer::Layer<double>::create(layer::ReluLayer<double>::TYPE, layer::Layer<double>::TLayerConfig()));
     theInputLayer.connect(*theReluLayer.get());
 
@@ -95,7 +72,7 @@ reluHalf()
 
     fillMatrix(theInput);
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theReluConfig;
     theReluConfig.insert(std::make_pair(std::string(layer::ReluLayer<double>::CONFIG_NEGATIVE_SLOPE), "0.5"));
     layer::Layer<double>::TUniqueHandle theReluLayer(layer::Layer<double>::create(layer::ReluLayer<double>::TYPE, theReluConfig));
@@ -119,6 +96,38 @@ reluHalf()
     return true;
 }
 
+bool
+reluGPU()
+{
+    const Dimension theInputDim(9, 9, 1);
+
+    Matrix<double> theInput(theInputDim);
+
+    fillMatrix(theInput);
+
+    layer::ConstInputLayer<double> theInputLayer(theInput);
+    layer::Layer<double>::TUniqueHandle theReluLayer(layer::Layer<double>::create(layer::ReluLayer<double>::TYPE, layer::Layer<double>::TLayerConfig()));
+    theInputLayer.connect(*theReluLayer.get());
+    theReluLayer->setMode(ComputeModeEnum::GPU);
+
+    theReluLayer->forward();
+    const Matrix<double> *theOutput = theReluLayer->getOutput();
+    const Dimension &theOutputDim = theOutput->getDimension();
+
+    if (theOutputDim != Dimension(9, 9, 1, 1) ||
+            theOutput->getData()[theOutput->offset()] != 0 ||
+            theOutput->getData()[theOutput->offset(4, 3)] != 34 ||
+            theOutput->getData()[theOutput->offset(7, 7)] != 0) {
+        std::cerr << "Relu.reluGPU test failed:" << std::endl
+                  << "input:" << std::endl
+                  << theInput << std::endl
+                  << "output:" << std::endl
+                  << *theOutput << std::endl;
+    }
+
+    return true;
+}
+
 }
 
 namespace test
@@ -129,6 +138,7 @@ ReluLayerTests::run()
 {
     reluDefault();
     reluHalf();
+    reluGPU();
 }
 
 }

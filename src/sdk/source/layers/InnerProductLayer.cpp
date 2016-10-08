@@ -40,6 +40,20 @@ InnerProductLayer<TDataType>::getType()
 
 template<typename TDataType>
 void
+InnerProductLayer<TDataType>::setMode(ComputeModeEnum inMode)
+{
+    (void)inMode;
+}
+
+template<typename TDataType>
+ComputeModeEnum
+InnerProductLayer<TDataType>::getMode()
+{
+    return ComputeModeEnum::CPU;
+}
+
+template<typename TDataType>
+void
 InnerProductLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 {
     inDescendentLayer.setForwardInput(*getOutput());
@@ -74,7 +88,7 @@ InnerProductLayer<TDataType>::forward()
 {
     const utils::Dimension &theDataDim = m_data->getDimension();
     const utils::Dimension &theSrcDim = m_input->getDimension();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getData();
+    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
     const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
     const utils::Matrix<TDataType>::data_type *theFilterData = m_weights->getData();
 

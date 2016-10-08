@@ -2,6 +2,7 @@
 
 #include <layers/PoolingLayer.hpp>
 
+#include "ConstInputLayer.hpp"
 #include "PrintUtils.hpp"
 
 #include <iostream>
@@ -19,7 +20,7 @@ void
 fillMatrix(Matrix<TDataType> &inMatrix)
 {
     const Dimension &theMatrixDim = inMatrix.getDimension();
-    Matrix<TDataType>::data_type *theData = inMatrix.getData();
+    Matrix<TDataType>::data_type *theData = inMatrix.getMutableData();
     for (int64_t w = 0; w < theMatrixDim.getW(); ++w) {
         for (int64_t z = 0; z < theMatrixDim.getZ(); ++z) {
             for (int64_t y = 0; y < theMatrixDim.getY(); ++y) {
@@ -31,30 +32,6 @@ fillMatrix(Matrix<TDataType> &inMatrix)
     }
 }
 
-template<typename TDataType>
-class InputLayer: public layer::Layer<TDataType>
-{
-public:
-    InputLayer(const Matrix<TDataType> &inInput): m_input(inInput) {}
-
-    virtual const char* getType() { return "input"; }
-    virtual void connect(layer::Layer<TDataType> &inDescendentLayer) override
-    {
-        inDescendentLayer.setForwardInput(m_input);
-    }
-    virtual void restore(const TDataRestoring &inStoredData) override {}
-    virtual void forward() override {}
-    virtual void backward() override {}
-    virtual const Matrix<TDataType>* getOutput() const override { return &m_input; }
-    virtual const Matrix<TDataType>* getDiff() const override { return nullptr; }
-
-private:
-    virtual void setForwardInput(const Matrix<TDataType> &inInput) override {}
-    virtual void setBackwardDiff(const Matrix<TDataType> &inDiff) override {}
-
-    const Matrix<TDataType> &m_input;
-};
-
 bool
 pooling1()
 {
@@ -64,7 +41,7 @@ pooling1()
 
     fillMatrix(theInput);
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig thePoolingConfig;
     thePoolingConfig.insert(std::make_pair(std::string(layer::PoolingLayer<double>::CONFIG_KERNEL_SIZE), "2"));
     thePoolingConfig.insert(std::make_pair(std::string(layer::PoolingLayer<double>::CONFIG_STRIDE), "1"));
@@ -99,7 +76,7 @@ pooling2()
 
     fillMatrix(theInput);
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig thePoolingConfig;
     thePoolingConfig.insert(std::make_pair(std::string(layer::PoolingLayer<double>::CONFIG_KERNEL_SIZE), "2"));
     thePoolingConfig.insert(std::make_pair(std::string(layer::PoolingLayer<double>::CONFIG_STRIDE), "2"));

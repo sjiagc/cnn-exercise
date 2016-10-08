@@ -78,6 +78,20 @@ ConvolutionLayer<TDataType>::getType()
 
 template<typename TDataType>
 void
+ConvolutionLayer<TDataType>::setMode(ComputeModeEnum inMode)
+{
+    (void)inMode;
+}
+
+template<typename TDataType>
+ComputeModeEnum
+ConvolutionLayer<TDataType>::getMode()
+{
+    return ComputeModeEnum::CPU;
+}
+
+template<typename TDataType>
+void
 ConvolutionLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 {
     inDescendentLayer.setForwardInput(*getOutput());
@@ -114,7 +128,7 @@ ConvolutionLayer<TDataType>::forward()
     const utils::Dimension &theFilterDim = m_weights->getDimension();
     int64_t theSrcStartOffsetX = - m_padding.getX();
     int64_t theSrcStartOffsetY = - m_padding.getY();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getData();
+    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
     const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
     const utils::Matrix<TDataType>::data_type *theFilterData = m_weights->getData();
     for (int64_t theInputIndex = 0, theInputCount = theDataDim.getW(); theInputIndex < theInputCount; ++theInputIndex) {

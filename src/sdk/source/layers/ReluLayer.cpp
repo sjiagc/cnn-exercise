@@ -12,6 +12,8 @@ ReluLayer<TDataType>::ReluLayer(const Layer<TDataType>::TLayerConfig &inConfig)
     : m_negativeSlope(0)
     , m_input(nullptr)
     , m_diffAhead(nullptr)
+    , m_mode(ComputeModeEnum::CPU)
+    , m_forwardMethod(&ReluLayer::forwardCPU)
 {
     if (inConfig.count(CONFIG_NEGATIVE_SLOPE)) {
         const std::string &theNegativeSlope = inConfig.find(CONFIG_NEGATIVE_SLOPE)->second;
@@ -34,6 +36,29 @@ ReluLayer<TDataType>::getType()
 
 template<typename TDataType>
 void
+ReluLayer<TDataType>::setMode(ComputeModeEnum inMode)
+{
+    switch(inMode) {
+    case ComputeModeEnum::CPU:
+        m_mode = ComputeModeEnum::CPU;
+        m_forwardMethod = &ReluLayer::forwardCPU;
+        break;
+    case ComputeModeEnum::GPU:
+        m_mode = ComputeModeEnum::GPU;
+        m_forwardMethod = &ReluLayer::forwardGPU;
+        break;
+    };
+}
+
+template<typename TDataType>
+ComputeModeEnum
+ReluLayer<TDataType>::getMode()
+{
+    return m_mode;
+}
+
+template<typename TDataType>
+void
 ReluLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 {
     inDescendentLayer.setForwardInput(*getOutput());
@@ -51,23 +76,7 @@ template<typename TDataType>
 void
 ReluLayer<TDataType>::forward()
 {
-    const utils::Dimension &theSrcDim = m_input->getDimension();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getData();
-    const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
-    for (int64_t w = 0, theWDim = theSrcDim.getW(); w < theWDim; ++w) {
-        for (int64_t z = 0, theZDim = theSrcDim.getZ(); z < theZDim; ++z) {
-            for (int64_t y = 0, theYDim = theSrcDim.getY(); y < theYDim; ++y) {
-                for (int64_t x = 0, theXDim = theSrcDim.getX(); x < theXDim; ++x) {
-                    int64_t theSrcOffset = m_input->offset(x, y, z, w);
-                    TDataType theSrcValue = theSrcData[theSrcOffset];
-                    if (theSrcValue <= 0)
-                        theSrcValue *= m_negativeSlope;
-                    int64_t theDstOffset = m_data->offset(x, y, z, w);
-                    theDstData[theDstOffset] = theSrcValue;
-                }
-            }
-        }
-    }
+    (this->*m_forwardMethod)();
 }
 
 template<typename TDataType>
@@ -107,6 +116,29 @@ void
 ReluLayer<TDataType>::setBackwardDiff(const utils::Matrix<TDataType> &inDiff)
 {
 
+}
+
+template<typename TDataType>
+void
+ReluLayer<TDataType>::forwardCPU()
+{
+    const utils::Dimension &theSrcDim = m_input->getDimension();
+    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
+    const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
+    for (int64_t w = 0, theWDim = theSrcDim.getW(); w < theWDim; ++w) {
+        for (int64_t z = 0, theZDim = theSrcDim.getZ(); z < theZDim; ++z) {
+            for (int64_t y = 0, theYDim = theSrcDim.getY(); y < theYDim; ++y) {
+                for (int64_t x = 0, theXDim = theSrcDim.getX(); x < theXDim; ++x) {
+                    int64_t theSrcOffset = m_input->offset(x, y, z, w);
+                    TDataType theSrcValue = theSrcData[theSrcOffset];
+                    if (theSrcValue <= 0)
+                        theSrcValue *= m_negativeSlope;
+                    int64_t theDstOffset = m_data->offset(x, y, z, w);
+                    theDstData[theDstOffset] = theSrcValue;
+                }
+            }
+        }
+    }
 }
 
 template class ReluLayer<double>;

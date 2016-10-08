@@ -4,6 +4,7 @@
 #include <Layer.hpp>
 #include <layers/ConvolutionLayer.hpp>
 
+#include "ConstInputLayer.hpp"
 #include "PrintUtils.hpp"
 
 #include <stdexcept>
@@ -22,7 +23,7 @@ void
 fillMatrix(Matrix<TDataType> &inMatrix)
 {
     const Dimension &theMatrixDim = inMatrix.getDimension();
-    Matrix<TDataType>::data_type *theData = inMatrix.getData();
+    Matrix<TDataType>::data_type *theData = inMatrix.getMutableData();
     for (int64_t w = 0; w < theMatrixDim.getW(); ++w) {
         for (int64_t z = 0; z < theMatrixDim.getZ(); ++z) {
             for (int64_t y = 0; y < theMatrixDim.getY(); ++y) {
@@ -33,30 +34,6 @@ fillMatrix(Matrix<TDataType> &inMatrix)
         }
     }
 }
-
-template<typename TDataType>
-class InputLayer: public layer::Layer<TDataType>
-{
-public:
-    InputLayer(const Matrix<TDataType> &inInput): m_input(inInput) {}
-
-    virtual const char* getType() { return "input"; }
-    virtual void connect(layer::Layer<TDataType> &inDescendentLayer) override
-    {
-        inDescendentLayer.setForwardInput(m_input);
-    }
-    virtual void restore(const TDataRestoring &inStoredData) override {}
-    virtual void forward() override {}
-    virtual void backward() override {}
-    virtual const Matrix<TDataType>* getOutput() const override { return &m_input; }
-    virtual const Matrix<TDataType>* getDiff() const override { return nullptr; }
-
-private:
-    virtual void setForwardInput(const Matrix<TDataType> &inInput) override {}
-    virtual void setBackwardDiff(const Matrix<TDataType> &inDiff) override {}
-
-    const Matrix<TDataType> &m_input;
-};
 
 bool
 conv1()
@@ -72,7 +49,7 @@ conv1()
     fillMatrix(theInput);
 
     {
-        Matrix<double>::data_type *theFilterData = theFilter.getData();
+        Matrix<double>::data_type *theFilterData = theFilter.getMutableData();
         theFilterData[theFilter.offset(0, 0)] = 0;
         theFilterData[theFilter.offset(0, 1)] = 1;
         theFilterData[theFilter.offset(0, 2)] = 0;
@@ -84,7 +61,7 @@ conv1()
         theFilterData[theFilter.offset(2, 2)] = 0;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theConvConfig;
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT), "1"));
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_KERNEL_SIZE), "3"));
@@ -130,7 +107,7 @@ conv2()
     fillMatrix(theInput);
 
     {
-        Matrix<double>::data_type *theFilterData = theFilter.getData();
+        Matrix<double>::data_type *theFilterData = theFilter.getMutableData();
         theFilterData[theFilter.offset(0, 0)] = 0;
         theFilterData[theFilter.offset(0, 1)] = 1;
         theFilterData[theFilter.offset(0, 2)] = 0;
@@ -142,7 +119,7 @@ conv2()
         theFilterData[theFilter.offset(2, 2)] = 0;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theConvConfig;
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT), "1"));
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_KERNEL_SIZE), "3"));
@@ -189,7 +166,7 @@ conv3()
     fillMatrix(theInput);
 
     {
-        Matrix<double>::data_type *theFilterData = theFilter.getData();
+        Matrix<double>::data_type *theFilterData = theFilter.getMutableData();
         theFilterData[theFilter.offset(0, 0)] = 0;
         theFilterData[theFilter.offset(0, 1)] = 1;
         theFilterData[theFilter.offset(0, 2)] = 0;
@@ -221,7 +198,7 @@ conv3()
         theFilterData[theFilter.offset(2, 2, 0, 2)] = 1;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theConvConfig;
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT), "3"));
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_KERNEL_SIZE), "3"));
@@ -273,7 +250,7 @@ convChannel()
     fillMatrix(theInput);
 
     {
-        Matrix<double>::data_type *theFilterData = theFilter.getData();
+        Matrix<double>::data_type *theFilterData = theFilter.getMutableData();
         theFilterData[theFilter.offset(0, 0, 0)] = 0;
         theFilterData[theFilter.offset(0, 1, 0)] = 1;
         theFilterData[theFilter.offset(0, 2, 0)] = 0;
@@ -305,7 +282,7 @@ convChannel()
         theFilterData[theFilter.offset(2, 2, 2)] = 1;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theConvConfig;
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT), "1"));
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_KERNEL_SIZE), "3"));
@@ -351,7 +328,7 @@ convPadding()
     fillMatrix(theInput);
 
     {
-        Matrix<double>::data_type *theFilterData = theFilter.getData();
+        Matrix<double>::data_type *theFilterData = theFilter.getMutableData();
         theFilterData[theFilter.offset(0, 0)] = 0;
         theFilterData[theFilter.offset(0, 1)] = 1;
         theFilterData[theFilter.offset(0, 2)] = 0;
@@ -363,7 +340,7 @@ convPadding()
         theFilterData[theFilter.offset(2, 2)] = 0;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theConvConfig;
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT), "1"));
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_KERNEL_SIZE), "3"));
@@ -409,7 +386,7 @@ convStride()
     fillMatrix(theInput);
 
     {
-        Matrix<double>::data_type *theFilterData = theFilter.getData();
+        Matrix<double>::data_type *theFilterData = theFilter.getMutableData();
         theFilterData[theFilter.offset(0, 0)] = 0;
         theFilterData[theFilter.offset(0, 1)] = 1;
         theFilterData[theFilter.offset(0, 2)] = 0;
@@ -421,7 +398,7 @@ convStride()
         theFilterData[theFilter.offset(2, 2)] = 0;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theConvConfig;
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT), "1"));
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_KERNEL_SIZE), "3"));
@@ -469,7 +446,7 @@ convBias1()
     fillMatrix(theInput);
 
     {
-        Matrix<double>::data_type *theFilterData = theFilter.getData();
+        Matrix<double>::data_type *theFilterData = theFilter.getMutableData();
         theFilterData[theFilter.offset(0, 0)] = 0;
         theFilterData[theFilter.offset(0, 1)] = 1;
         theFilterData[theFilter.offset(0, 2)] = 0;
@@ -480,11 +457,11 @@ convBias1()
         theFilterData[theFilter.offset(2, 1)] = 1;
         theFilterData[theFilter.offset(2, 2)] = 0;
 
-        Matrix<double>::data_type *theBiasData = theBias.getData();
+        Matrix<double>::data_type *theBiasData = theBias.getMutableData();
         theBiasData[theBias.offset()] = 2.5;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theConvConfig;
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT), "1"));
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_KERNEL_SIZE), "3"));
@@ -536,7 +513,7 @@ convBias2()
     fillMatrix(theInput);
 
     {
-        Matrix<double>::data_type *theFilterData = theFilter.getData();
+        Matrix<double>::data_type *theFilterData = theFilter.getMutableData();
         theFilterData[theFilter.offset(0, 0)] = 0;
         theFilterData[theFilter.offset(0, 1)] = 1;
         theFilterData[theFilter.offset(0, 2)] = 0;
@@ -567,13 +544,13 @@ convBias2()
         theFilterData[theFilter.offset(2, 1, 0, 2)] = 0;
         theFilterData[theFilter.offset(2, 2, 0, 2)] = 1;
 
-        Matrix<double>::data_type *theBiasData = theBias.getData();
+        Matrix<double>::data_type *theBiasData = theBias.getMutableData();
         theBiasData[theBias.offset(0)] = 2.5;
         theBiasData[theBias.offset(1)] = 4.6;
         theBiasData[theBias.offset(2)] = 1.2;
     }
 
-    InputLayer<double> theInputLayer(theInput);
+    layer::ConstInputLayer<double> theInputLayer(theInput);
     layer::Layer<double>::TLayerConfig theConvConfig;
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT), "3"));
     theConvConfig.insert(std::make_pair(std::string(layer::ConvolutionLayer<double>::CONFIG_KERNEL_SIZE), "3"));

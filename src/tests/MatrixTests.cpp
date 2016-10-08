@@ -19,7 +19,7 @@ void
 fillMatrix(Matrix<TDataType> &inMatrix)
 {
     const Dimension &theMatrixDim = inMatrix.getDimension();
-    Matrix<TDataType>::data_type *theData = inMatrix.getData();
+    Matrix<TDataType>::data_type *theData = inMatrix.getMutableData();
     for (int64_t w = 0; w < theMatrixDim.getW(); ++w) {
         for (int64_t z = 0; z < theMatrixDim.getZ(); ++z) {
             for (int64_t y = 0; y < theMatrixDim.getY(); ++y) {
@@ -108,7 +108,7 @@ sub1()
     const Dimension theStartDim(3, 3, 0);
     const Dimension theEndDim(7, 6, 0);
     Matrix<double> theSub = theOrigin.sub(theStartDim, theEndDim);
-    Matrix<double>::data_type *theSubData = theSub.getData();
+    const Matrix<double>::data_type *theSubData = theSub.getData();
     if (theSubData[theSub.offset(0,0)] != 33 ||
             theSubData[theSub.offset(3, 2)] != 56 ||
             theSubData[theSub.offset(2, 1)] != 45) {
@@ -131,7 +131,7 @@ reshape()
     fillMatrix(theOrigin);
     Matrix<double> theReshaped(theOrigin);
     theReshaped.reshape(theReshapedDim);
-    Matrix<double>::data_type *theReshapedData = theReshaped.getData();
+    Matrix<double>::data_type *theReshapedData = theReshaped.getMutableData();
     if (theReshapedData[theReshaped.offset(0,0)] != 0 ||
             theReshapedData[theReshaped.offset(3, 2)] != 41 ||
             theReshapedData[theReshaped.offset(2, 1)] != 21) {

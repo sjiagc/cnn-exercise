@@ -1,6 +1,6 @@
 #include "PrintUtils.hpp"
 
-#include <utils/Types.hpp>
+#include <utils/Dimension.hpp>
 
 namespace test
 {

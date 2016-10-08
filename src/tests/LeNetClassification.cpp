@@ -8,6 +8,7 @@
 #include <layers/ReluLayer.hpp>
 #include <layers/SoftMaxLayer.hpp>
 
+#include "MemoryInputLayer.hpp"
 #include "PrintUtils.hpp"
 
 #include <stdexcept>
@@ -26,35 +27,6 @@ using namespace test;
 using utils::Dimension;
 using utils::Matrix;
 
-template<typename TDataType>
-class InputLayer: public layer::Layer<TDataType>
-{
-public:
-    InputLayer(const Dimension &inInputDim): m_input(inInputDim) {}
-
-    void setInput(const Matrix<TDataType> &inInput)
-    {
-        m_input = inInput;
-    }
-
-    virtual const char* getType() { return "input"; }
-    virtual void connect(layer::Layer<TDataType> &inDescendentLayer) override
-    {
-        inDescendentLayer.setForwardInput(m_input);
-    }
-    virtual void restore(const TDataRestoring &inStoredData) override {}
-    virtual void forward() override {}
-    virtual void backward() override {}
-    virtual const Matrix<TDataType>* getOutput() const override { return &m_input; }
-    virtual const Matrix<TDataType>* getDiff() const override { return nullptr; }
-
-private:
-    virtual void setForwardInput(const Matrix<TDataType> &inInput) override {}
-    virtual void setBackwardDiff(const Matrix<TDataType> &inDiff) override {}
-
-    Matrix<TDataType> m_input;
-};
-
 std::unique_ptr<Matrix<double>>
 ReadStoredData(const char *inFilePath)
 {
@@ -70,7 +42,7 @@ ReadStoredData(const char *inFilePath)
     int64_t theXDim;
     iss >> theWDim >> theZDim >> theYDim >> theXDim;
     std::unique_ptr<Matrix<double>> theMatrix(new Matrix<double>(Dimension(theXDim, theYDim, theZDim, theWDim)));
-    Matrix<double>::data_type *theData = theMatrix->getData();
+    Matrix<double>::data_type *theData = theMatrix->getMutableData();
     int64_t theDataCount = 0;
     while (theInput) {
         theInput.getline(theBuf, 1024);
@@ -90,7 +62,7 @@ bool
 classification()
 {
     // input
-    InputLayer<double> theInput(Dimension(28, 28));
+    layer::MemoryInputLayer<double> theInput(Dimension(28, 28));
     // conv1
     layer::Layer<double>::TLayerConfig theConv1Config;
     theConv1Config[std::string(layer::ConvolutionLayer<double>::CONFIG_NUM_OUTPUT)] = "20";

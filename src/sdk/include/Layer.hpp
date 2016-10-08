@@ -2,6 +2,7 @@
 #define TOY_CNN_SDK_LAYER_HPP__
 
 #include "utils/Matrix.hpp"
+#include "ToyCnnDefs.hpp"
 
 #include <map>
 #include <memory>
@@ -21,6 +22,8 @@ public:
     static TUniqueHandle create(const std::string &inLayerType, const TLayerConfig &inLayerConfig);
 
     virtual const char* getType() = 0;
+    virtual void setMode(ComputeModeEnum inMode) = 0;
+    virtual ComputeModeEnum getMode() = 0;
     virtual void connect(Layer &inDescendentLayer) = 0;
     virtual void restore(const TDataRestoring &inStoredData) = 0;
     virtual void forward() = 0;

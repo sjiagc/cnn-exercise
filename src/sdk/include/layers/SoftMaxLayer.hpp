@@ -15,7 +15,9 @@ public:
 
     SoftMaxLayer(const Layer<TDataType>::TLayerConfig &inConfig);
 
-    virtual const char* getType();
+    virtual const char* getType() override;
+    virtual void setMode(ComputeModeEnum inMode) override;
+    virtual ComputeModeEnum getMode() override;
     virtual void connect(Layer<TDataType> &inDescendentLayer) override;
     virtual void restore(const TDataRestoring &inStoredData) override;
     virtual void forward() override;

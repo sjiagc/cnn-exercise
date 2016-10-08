@@ -1,6 +1,6 @@
 #include "DimensionTests.hpp"
 
-#include <utils/Types.hpp>
+#include <utils/Dimension.hpp>
 
 #include "PrintUtils.hpp"
 
