@@ -18,7 +18,7 @@ template<typename TDataType> const char* PoolingLayer<TDataType>::CONFIG_PADDING
 template<typename TDataType> const char* PoolingLayer<TDataType>::CONFIG_PADDING_Y = "padding_y";
 
 template<typename TDataType>
-PoolingLayer<TDataType>::PoolingLayer(const Layer<TDataType>::TLayerConfig &inConfig)
+PoolingLayer<TDataType>::PoolingLayer(const typename Layer<TDataType>::TLayerConfig &inConfig)
     : m_numOfOutput(1)
     , m_kernelSize(3, 3, 1, 0)
     , m_padding(0)
@@ -92,7 +92,7 @@ PoolingLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 
 template<typename TDataType>
 void
-PoolingLayer<TDataType>::restore(const TDataRestoring &inStoredData)
+PoolingLayer<TDataType>::restore(const typename Layer<TDataType>::TDataRestoring&)
 {
 
 }
@@ -104,13 +104,13 @@ PoolingLayer<TDataType>::forward()
     const utils::Dimension &theDataDim = m_data->getDimension();
     int64_t theSrcStartOffsetX = - m_padding.getX();
     int64_t theSrcStartOffsetY = - m_padding.getY();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
-    const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
+    typename utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
+    const typename utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
     for (int64_t theInputIndex = 0, theInputCount = theDataDim.getW(); theInputIndex < theInputCount; ++theInputIndex) {
         for (int64_t theChannelIndex = 0, theChannelCount = theDataDim.getZ(); theChannelIndex < theChannelCount; ++theChannelIndex) {
             for (int64_t x = 0, theXDim = theDataDim.getX(); x < theXDim; ++x) {
                 for (int64_t y = 0, theYDim = theDataDim.getY(); y < theYDim; ++y) {
-                    utils::Matrix<TDataType>::data_type theDstValue = std::numeric_limits<TDataType>::lowest();
+                    typename utils::Matrix<TDataType>::data_type theDstValue = std::numeric_limits<TDataType>::lowest();
                     for (int64_t theXInFilter = 0, theXDimOfFilter = m_kernelSize.getX(); theXInFilter < theXDimOfFilter; ++theXInFilter) {
                         for (int64_t theYInFilter = 0, theYDimOfFilter = m_kernelSize.getY(); theYInFilter < theYDimOfFilter; ++theYInFilter) {
                             TDataType theValueFromSrc = std::numeric_limits<TDataType>::lowest();

@@ -1,6 +1,7 @@
 #include <layers/SoftMaxLayer.hpp>
 
 #include <limits>
+#include <cmath>
 
 namespace layer
 {
@@ -8,9 +9,11 @@ namespace layer
 template<typename TDataType> const char* SoftMaxLayer<TDataType>::TYPE = "SoftMax";
 
 template<typename TDataType>
-SoftMaxLayer<TDataType>::SoftMaxLayer(const Layer<TDataType>::TLayerConfig &inConfig)
+SoftMaxLayer<TDataType>::SoftMaxLayer(const typename Layer<TDataType>::TLayerConfig &inConfig)
     : m_input(nullptr)
     , m_diffAhead(nullptr)
+    , m_mode(ComputeModeEnum::CPU)
+    , m_forwardMethod(&SoftMaxLayer::forwardCPU)
 {
 }
 
@@ -31,14 +34,23 @@ template<typename TDataType>
 void
 SoftMaxLayer<TDataType>::setMode(ComputeModeEnum inMode)
 {
-    (void)inMode;
+    switch(inMode) {
+    case ComputeModeEnum::CPU:
+        m_mode = ComputeModeEnum::CPU;
+        m_forwardMethod = &SoftMaxLayer::forwardCPU;
+        break;
+    case ComputeModeEnum::GPU:
+        m_mode = ComputeModeEnum::GPU;
+        m_forwardMethod = &SoftMaxLayer::forwardGPU;
+        break;
+    };
 }
 
 template<typename TDataType>
 ComputeModeEnum
 SoftMaxLayer<TDataType>::getMode()
 {
-    return ComputeModeEnum::CPU;
+    return m_mode;
 }
 
 template<typename TDataType>
@@ -51,7 +63,7 @@ SoftMaxLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 
 template<typename TDataType>
 void
-SoftMaxLayer<TDataType>::restore(const TDataRestoring &inStoredData)
+SoftMaxLayer<TDataType>::restore(const typename Layer<TDataType>::TDataRestoring &inStoredData)
 {
 
 }
@@ -61,11 +73,11 @@ void
 SoftMaxLayer<TDataType>::forward()
 {
     const utils::Dimension &theSrcDim = m_input->getDimension();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
-    const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
+    typename utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
+    const typename utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
 
     // Get max value
-    utils::Matrix<TDataType>::data_type theMax = theSrcData[m_input->offset()];
+    typename utils::Matrix<TDataType>::data_type theMax = theSrcData[m_input->offset()];
     for (int64_t w = 0, theWDim = theSrcDim.getW(); w < theWDim; ++w) {
         for (int64_t z = 0, theZDim = theSrcDim.getZ(); z < theZDim; ++z) {
             for (int64_t y = 0, theYDim = theSrcDim.getY(); y < theYDim; ++y) {
@@ -78,12 +90,12 @@ SoftMaxLayer<TDataType>::forward()
         }
     }
     // Substract max, exp and sum
-    utils::Matrix<TDataType>::data_type theSum = 0;
+    typename utils::Matrix<TDataType>::data_type theSum = 0;
     for (int64_t w = 0, theWDim = theSrcDim.getW(); w < theWDim; ++w) {
         for (int64_t z = 0, theZDim = theSrcDim.getZ(); z < theZDim; ++z) {
             for (int64_t y = 0, theYDim = theSrcDim.getY(); y < theYDim; ++y) {
                 for (int64_t x = 0, theXDim = theSrcDim.getX(); x < theXDim; ++x) {
-                    utils::Matrix<TDataType>::data_type theValue = exp(theSrcData[m_input->offset(x, y, z, w)] - theMax);
+                    typename utils::Matrix<TDataType>::data_type theValue = exp(theSrcData[m_input->offset(x, y, z, w)] - theMax);
                     theDstData[m_data->offset(x, y, z, w)] = theValue;
                     theSum += theValue;
                 }
@@ -137,6 +149,20 @@ SoftMaxLayer<TDataType>::setForwardInput(const utils::Matrix<TDataType> &inInput
 template<typename TDataType>
 void
 SoftMaxLayer<TDataType>::setBackwardDiff(const utils::Matrix<TDataType> &inDiff)
+{
+
+}
+
+template<typename TDataType>
+void
+SoftMaxLayer<TDataType>::forwardCPU()
+{
+
+}
+
+template<typename TDataType>
+void
+SoftMaxLayer<TDataType>::forwardGPU()
 {
 
 }

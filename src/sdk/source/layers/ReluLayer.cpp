@@ -8,7 +8,7 @@ namespace layer
 template<typename TDataType> const char* ReluLayer<TDataType>::TYPE = "Relu";
 template<typename TDataType> const char* ReluLayer<TDataType>::CONFIG_NEGATIVE_SLOPE = "negative_slope";
 template<typename TDataType>
-ReluLayer<TDataType>::ReluLayer(const Layer<TDataType>::TLayerConfig &inConfig)
+ReluLayer<TDataType>::ReluLayer(const typename Layer<TDataType>::TLayerConfig &inConfig)
     : m_negativeSlope(0)
     , m_input(nullptr)
     , m_diffAhead(nullptr)
@@ -67,7 +67,7 @@ ReluLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 
 template<typename TDataType>
 void
-ReluLayer<TDataType>::restore(const TDataRestoring &inStoredData)
+ReluLayer<TDataType>::restore(const typename Layer<TDataType>::TDataRestoring &inStoredData)
 {
 
 }
@@ -123,8 +123,8 @@ void
 ReluLayer<TDataType>::forwardCPU()
 {
     const utils::Dimension &theSrcDim = m_input->getDimension();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
-    const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
+    typename utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
+    const typename utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
     for (int64_t w = 0, theWDim = theSrcDim.getW(); w < theWDim; ++w) {
         for (int64_t z = 0, theZDim = theSrcDim.getZ(); z < theZDim; ++z) {
             for (int64_t y = 0, theYDim = theSrcDim.getY(); y < theYDim; ++y) {

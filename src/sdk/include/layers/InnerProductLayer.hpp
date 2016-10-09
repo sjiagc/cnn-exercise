@@ -16,13 +16,13 @@ public:
     static const char *RESTORE_WEIGHTS;
     static const char *RESTORE_BIAS;
 
-    InnerProductLayer(const Layer<TDataType>::TLayerConfig &inConfig);
+    InnerProductLayer(const typename Layer<TDataType>::TLayerConfig &inConfig);
 
     virtual const char* getType() override;
     virtual void setMode(ComputeModeEnum inMode) override;
     virtual ComputeModeEnum getMode() override;
     virtual void connect(Layer<TDataType> &inDescendentLayer) override;
-    virtual void restore(const TDataRestoring &inStoredData) override;
+    virtual void restore(const typename Layer<TDataType>::TDataRestoring &inStoredData) override;
     virtual void forward() override;
     virtual void backward() override;
     virtual const utils::Matrix<TDataType>* getOutput() const override;

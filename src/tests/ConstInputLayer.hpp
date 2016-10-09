@@ -19,7 +19,7 @@ public:
     {
         inDescendentLayer.setForwardInput(m_input);
     }
-    virtual void restore(const TDataRestoring &inStoredData) override {}
+    virtual void restore(const typename Layer<TDataType>::TDataRestoring&) override {}
     virtual void forward() override {}
     virtual void backward() override {}
     virtual const utils::Matrix<TDataType>* getOutput() const override { return &m_input; }

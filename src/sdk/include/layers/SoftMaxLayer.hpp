@@ -13,13 +13,13 @@ class SoftMaxLayer final: public Layer<TDataType>
 public:
     static const char *TYPE;
 
-    SoftMaxLayer(const Layer<TDataType>::TLayerConfig &inConfig);
+    SoftMaxLayer(const typename Layer<TDataType>::TLayerConfig &inConfig);
 
     virtual const char* getType() override;
     virtual void setMode(ComputeModeEnum inMode) override;
     virtual ComputeModeEnum getMode() override;
     virtual void connect(Layer<TDataType> &inDescendentLayer) override;
-    virtual void restore(const TDataRestoring &inStoredData) override;
+    virtual void restore(const typename Layer<TDataType>::TDataRestoring &inStoredData) override;
     virtual void forward() override;
     virtual void backward() override;
     virtual const utils::Matrix<TDataType>* getOutput() const override;
@@ -30,12 +30,18 @@ private:
     virtual void setForwardInput(const utils::Matrix<TDataType> &inInput) override;
     virtual void setBackwardDiff(const utils::Matrix<TDataType> &inDiff) override;
 
+    void forwardCPU();
+    void forwardGPU();
+
 private:
     TDataType m_negativeSlope;
     std::unique_ptr<utils::Matrix<TDataType>> m_data;
     std::unique_ptr<utils::Matrix<TDataType>> m_diff;
     const utils::Matrix<TDataType> *m_input;
     const utils::Matrix<TDataType> *m_diffAhead;
+
+    ComputeModeEnum m_mode;
+    void (SoftMaxLayer::*m_forwardMethod)();
 };
 
 }

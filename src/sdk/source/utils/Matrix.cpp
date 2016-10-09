@@ -159,7 +159,7 @@ Matrix<TDataType>::reshape(const Dimension &inDimension)
 
 template<typename TDataType>
 int64_t
-Matrix<TDataType>::offset(int64_t inX = 0, int64_t inY = 0, int64_t inZ = 0, int64_t inW = 0) const
+Matrix<TDataType>::offset(int64_t inX, int64_t inY, int64_t inZ, int64_t inW) const
 {
     if (inX >= m_dimension.getX() || inX < 0 ||
             inY >= m_dimension.getY() || inY < 0 ||

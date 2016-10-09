@@ -20,8 +20,8 @@
 namespace
 {
 
-#define MODEL_DATA_PREFIX "D:/develop/dl/cnn-exercise/data/lenet/model_data/"
-#define TEST_DATA_PREFIX "D:/develop/dl/cnn-exercise/data/lenet/test_data/"
+#define MODEL_DATA_PREFIX "/data/develop/dl/cnn-exercise/data/lenet/model_data/"
+#define TEST_DATA_PREFIX "/data/develop/dl/cnn-exercise/data/lenet/test_data/"
 using namespace test;
 
 using utils::Dimension;

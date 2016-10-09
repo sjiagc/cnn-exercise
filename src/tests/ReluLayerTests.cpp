@@ -20,7 +20,7 @@ void
 fillMatrix(Matrix<TDataType> &inMatrix)
 {
     const Dimension &theMatrixDim = inMatrix.getDimension();
-    Matrix<TDataType>::data_type *theData = inMatrix.getMutableData();
+    typename Matrix<TDataType>::data_type *theData = inMatrix.getMutableData();
     for (int64_t w = 0; w < theMatrixDim.getW(); ++w) {
         for (int64_t z = 0; z < theMatrixDim.getZ(); ++z) {
             for (int64_t y = 0; y < theMatrixDim.getY(); ++y) {
@@ -122,6 +122,8 @@ reluGPU()
                   << "input:" << std::endl
                   << theInput << std::endl
                   << "output:" << std::endl
+                  << "43: " << theOutput->offset(4, 3)
+                  << ", " << theOutput->getData()[theOutput->offset(4, 3)] << std::endl
                   << *theOutput << std::endl;
     }
 

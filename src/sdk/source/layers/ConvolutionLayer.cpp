@@ -21,7 +21,7 @@ template<typename TDataType> const char* ConvolutionLayer<TDataType>::RESTORE_WE
 template<typename TDataType> const char* ConvolutionLayer<TDataType>::RESTORE_BIAS = "bias";
 
 template<typename TDataType>
-ConvolutionLayer<TDataType>::ConvolutionLayer(const Layer<TDataType>::TLayerConfig &inConfig)
+ConvolutionLayer<TDataType>::ConvolutionLayer(const typename Layer<TDataType>::TLayerConfig &inConfig)
     : m_numOfOutput(1)
     , m_kernelSize(3, 3, 1, 0)
     , m_padding(0)
@@ -100,7 +100,7 @@ ConvolutionLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 
 template<typename TDataType>
 void
-ConvolutionLayer<TDataType>::restore(const TDataRestoring &inStoredData)
+ConvolutionLayer<TDataType>::restore(const typename Layer<TDataType>::TDataRestoring &inStoredData)
 {
     if (inStoredData.count(RESTORE_WEIGHTS)) {
         const utils::Matrix<TDataType> *theWeights = inStoredData.find(RESTORE_WEIGHTS)->second;
@@ -128,14 +128,14 @@ ConvolutionLayer<TDataType>::forward()
     const utils::Dimension &theFilterDim = m_weights->getDimension();
     int64_t theSrcStartOffsetX = - m_padding.getX();
     int64_t theSrcStartOffsetY = - m_padding.getY();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
-    const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
-    const utils::Matrix<TDataType>::data_type *theFilterData = m_weights->getData();
+    typename utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
+    const typename utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
+    const typename utils::Matrix<TDataType>::data_type *theFilterData = m_weights->getData();
     for (int64_t theInputIndex = 0, theInputCount = theDataDim.getW(); theInputIndex < theInputCount; ++theInputIndex) {
         for (int64_t theOutputIndex = 0, theOutputCount = theDataDim.getZ(); theOutputIndex < theOutputCount; ++theOutputIndex) {
             for (int64_t x = 0, theXDim = theDataDim.getX(); x < theXDim; ++x) {
                 for (int64_t y = 0, theYDim = theDataDim.getY(); y < theYDim; ++y) {
-                    utils::Matrix<TDataType>::data_type theDstValue = 0;
+                    typename utils::Matrix<TDataType>::data_type theDstValue = 0;
                     for (int64_t theXInFilter = 0, theXDimOfFilter = theFilterDim.getX(); theXInFilter < theXDimOfFilter; ++theXInFilter) {
                         for (int64_t theYInFilter = 0, theYDimOfFilter = theFilterDim.getY(); theYInFilter < theYDimOfFilter; ++theYInFilter) {
                             TDataType theValue = 0;

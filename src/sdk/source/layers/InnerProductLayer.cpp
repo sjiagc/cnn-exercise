@@ -13,7 +13,7 @@ template<typename TDataType> const char* InnerProductLayer<TDataType>::RESTORE_B
 
 
 template<typename TDataType>
-InnerProductLayer<TDataType>::InnerProductLayer(const Layer<TDataType>::TLayerConfig &inConfig)
+InnerProductLayer<TDataType>::InnerProductLayer(const typename Layer<TDataType>::TLayerConfig &inConfig)
     : m_numOfOutput(1)
     , m_hasBias(false)
     , m_input(nullptr)
@@ -62,7 +62,7 @@ InnerProductLayer<TDataType>::connect(Layer<TDataType> &inDescendentLayer)
 
 template<typename TDataType>
 void
-InnerProductLayer<TDataType>::restore(const TDataRestoring &inStoredData)
+InnerProductLayer<TDataType>::restore(const typename Layer<TDataType>::TDataRestoring &inStoredData)
 {
     if (inStoredData.count(RESTORE_WEIGHTS)) {
         const utils::Matrix<TDataType> *theWeights = inStoredData.find(RESTORE_WEIGHTS)->second;
@@ -88,14 +88,14 @@ InnerProductLayer<TDataType>::forward()
 {
     const utils::Dimension &theDataDim = m_data->getDimension();
     const utils::Dimension &theSrcDim = m_input->getDimension();
-    utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
-    const utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
-    const utils::Matrix<TDataType>::data_type *theFilterData = m_weights->getData();
+    typename utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
+    const typename utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
+    const typename utils::Matrix<TDataType>::data_type *theFilterData = m_weights->getData();
 
     for (int64_t theInputIndex = 0, theInputCount = theDataDim.getW(); theInputIndex < theInputCount; ++theInputIndex) {
         for (int64_t theOutputIndex = 0, theOutputCount = theDataDim.getZ(); theOutputIndex < theOutputCount; ++theOutputIndex) {
             int64_t theFilterIndex = 0;
-            utils::Matrix<TDataType>::data_type theInnerProduct = 0;
+            typename utils::Matrix<TDataType>::data_type theInnerProduct = 0;
             for (int64_t z = 0, theZDim = theSrcDim.getZ(); z < theZDim; ++z) {
                 for (int64_t y = 0, theYDim = theSrcDim.getY(); y < theYDim; ++y) {
                     for (int64_t x = 0, theXDim = theSrcDim.getX(); x < theXDim; ++x) {

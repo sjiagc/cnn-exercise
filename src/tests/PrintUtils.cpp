@@ -17,7 +17,7 @@ template<typename TDataType>
 std::ostream& operator << (std::ostream &inStream, const utils::Matrix<TDataType> &inMatrix)
 {
     const utils::Dimension &theDim = inMatrix.getDimension();
-    const utils::Matrix<TDataType>::data_type *theData = inMatrix.getData();
+    const typename utils::Matrix<TDataType>::data_type *theData = inMatrix.getData();
     for (int64_t w = 0; w < theDim.getW(); ++w) {
         for (int64_t z = 0; z < theDim.getZ(); ++z) {
             inStream << "(" << w << ", " << z << "):" << std::endl;

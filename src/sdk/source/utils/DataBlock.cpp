@@ -66,7 +66,7 @@ DataBlock<TDataType>::syncCPUData()
     if (m_cpuDirty && m_gpuDirty)
         throw std::runtime_error("DataBlock::syncData: data lost sync - both CPU and GPU data are dirty");
     if (m_gpuDirty) {
-        if (cudaMemcpyAsync(m_cpuData.get(),
+        if (cudaMemcpy(m_cpuData.get(),
                         m_gpuData.get(),
                         m_elementCount * sizeof(TDataType),
                         cudaMemcpyDeviceToHost) != cudaSuccess)
@@ -82,7 +82,7 @@ DataBlock<TDataType>::syncGPUData()
     if (m_cpuDirty && m_gpuDirty)
         throw std::runtime_error("DataBlock::syncGPUData: data lost sync - both CPU and GPU data are dirty");
     if (m_cpuDirty) {
-        if (cudaMemcpyAsync(m_gpuData.get(),
+        if (cudaMemcpy(m_gpuData.get(),
                         m_cpuData.get(),
                         m_elementCount * sizeof(TDataType),
                         cudaMemcpyHostToDevice) != cudaSuccess)
