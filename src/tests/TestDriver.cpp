@@ -28,7 +28,7 @@ main()
         RUN_TEST(test::ReluLayerTests);
         RUN_TEST(test::SoftMaxLayerTests);
         RUN_TEST(test::LeNetClassificationTests);
-    } catch (std::exception e) {
+    } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
     }
 }

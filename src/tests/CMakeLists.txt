@@ -26,4 +26,4 @@ set(SOURCES
 include_directories(../sdk/include)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} toy-cnn ${CUDA_CUDART_LIBRARY})
+target_link_libraries(${PROJECT_NAME} toy-cnn)

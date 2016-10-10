@@ -72,6 +72,51 @@ template<typename TDataType>
 void
 SoftMaxLayer<TDataType>::forward()
 {
+    (this->*m_forwardMethod)();
+}
+
+template<typename TDataType>
+void
+SoftMaxLayer<TDataType>::backward()
+{
+
+}
+
+template<typename TDataType>
+const utils::Matrix<TDataType>*
+SoftMaxLayer<TDataType>::getOutput() const
+{
+    return m_data.get();
+}
+
+template<typename TDataType>
+const utils::Matrix<TDataType>*
+SoftMaxLayer<TDataType>::getDiff() const
+{
+    return m_diff.get();
+}
+
+template<typename TDataType>
+void
+SoftMaxLayer<TDataType>::setForwardInput(const utils::Matrix<TDataType> &inInput)
+{
+    const utils::Dimension &theInputDim = inInput.getDimension();
+    if (theInputDim.axisCount() < 1)
+        throw std::runtime_error("SoftMaxLayer::setForwardInput: invalid input dimension");
+    m_data.reset(new utils::Matrix<TDataType>(theInputDim));
+    m_input = &inInput;
+}
+
+template<typename TDataType>
+void
+SoftMaxLayer<TDataType>::setBackwardDiff(const utils::Matrix<TDataType> &inDiff)
+{
+}
+
+template<typename TDataType>
+void
+SoftMaxLayer<TDataType>::forwardCPU()
+{
     const utils::Dimension &theSrcDim = m_input->getDimension();
     typename utils::Matrix<TDataType>::data_type *theDstData = m_data->getMutableData();
     const typename utils::Matrix<TDataType>::data_type *theSrcData = m_input->getData();
@@ -112,59 +157,6 @@ SoftMaxLayer<TDataType>::forward()
             }
         }
     }
-}
-
-template<typename TDataType>
-void
-SoftMaxLayer<TDataType>::backward()
-{
-
-}
-
-template<typename TDataType>
-const utils::Matrix<TDataType>*
-SoftMaxLayer<TDataType>::getOutput() const
-{
-    return m_data.get();
-}
-
-template<typename TDataType>
-const utils::Matrix<TDataType>*
-SoftMaxLayer<TDataType>::getDiff() const
-{
-    return m_diff.get();
-}
-
-template<typename TDataType>
-void
-SoftMaxLayer<TDataType>::setForwardInput(const utils::Matrix<TDataType> &inInput)
-{
-    const utils::Dimension &theInputDim = inInput.getDimension();
-    if (theInputDim.axisCount() < 1)
-        throw std::runtime_error("SoftMaxLayer::setForwardInput: invalid input dimension");
-    m_data.reset(new utils::Matrix<TDataType>(theInputDim));
-    m_input = &inInput;
-}
-
-template<typename TDataType>
-void
-SoftMaxLayer<TDataType>::setBackwardDiff(const utils::Matrix<TDataType> &inDiff)
-{
-
-}
-
-template<typename TDataType>
-void
-SoftMaxLayer<TDataType>::forwardCPU()
-{
-
-}
-
-template<typename TDataType>
-void
-SoftMaxLayer<TDataType>::forwardGPU()
-{
-
 }
 
 template class SoftMaxLayer<double>;

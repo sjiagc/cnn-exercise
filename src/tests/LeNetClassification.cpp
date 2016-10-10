@@ -98,6 +98,7 @@ classification()
     layer::Layer<double>::TUniqueHandle theIP1(layer::Layer<double>::create(layer::InnerProductLayer<double>::TYPE, theIP1Config));
     // relu1
     layer::Layer<double>::TUniqueHandle theRelu1(layer::Layer<double>::create(layer::ReluLayer<double>::TYPE, layer::Layer<double>::TLayerConfig()));
+    theRelu1->setMode(ComputeModeEnum::GPU);
     // ip2
     layer::Layer<double>::TLayerConfig theIP2Config;
     theIP2Config.insert(std::make_pair(std::string(layer::InnerProductLayer<double>::CONFIG_NUM_OUTPUT), "10"));
@@ -105,6 +106,7 @@ classification()
     layer::Layer<double>::TUniqueHandle theIP2(layer::Layer<double>::create(layer::InnerProductLayer<double>::TYPE, theIP2Config));
     // prob
     layer::Layer<double>::TUniqueHandle theProb(layer::Layer<double>::create(layer::SoftMaxLayer<double>::TYPE, layer::Layer<double>::TLayerConfig()));
+    theProb->setMode(ComputeModeEnum::GPU);
 
     // Link
     theInput.connect(*theConv1.get());

@@ -79,6 +79,146 @@ softMax1D()
     return true;
 }
 
+bool
+softMax2D()
+{
+    const Dimension theInputDim(10, 15);
+
+    Matrix<double> theInput(theInputDim);
+
+    fillMatrix(theInput);
+
+    layer::ConstInputLayer<double> theInputLayer(theInput);
+    layer::Layer<double>::TUniqueHandle theSoftMaxLayer(layer::Layer<double>::create(layer::SoftMaxLayer<double>::TYPE, layer::Layer<double>::TLayerConfig()));
+    theInputLayer.connect(*theSoftMaxLayer.get());
+
+    theSoftMaxLayer->forward();
+    const Matrix<double> *theOutput = theSoftMaxLayer->getOutput();
+    const Dimension &theOutputDim = theOutput->getDimension();
+
+    bool theIsFailed = false;
+    if (theOutputDim != Dimension(10, 15)) {
+        theIsFailed = true;
+    } else {
+        utils::Matrix<double>::data_type theSum = 0;
+        for (int64_t w = 0, theWDim = theOutputDim.getW(); w < theWDim; ++w) {
+            for (int64_t z = 0, theZDim = theOutputDim.getZ(); z < theZDim; ++z) {
+                for (int64_t y = 0, theYDim = theOutputDim.getY(); y < theYDim; ++y) {
+                    for (int64_t x = 0, theXDim = theOutputDim.getX(); x < theXDim; ++x) {
+                        theSum += theOutput->getData()[theOutput->offset(x, y, z, w)];
+                    }
+                }
+            }
+        }
+        if (fabs(theSum - 1) >= 1e-6)
+            theIsFailed = true;
+    }
+
+    if (theIsFailed) {
+        std::cerr << "SoftMax.softMax2D test failed:" << std::endl
+                  << "input:" << std::endl
+                  << theInput << std::endl
+                  << "output:" << std::endl
+                  << *theOutput << std::endl;
+    }
+
+    return true;
+}
+
+bool
+softMax1DGPU()
+{
+    const Dimension theInputDim(10);
+
+    Matrix<double> theInput(theInputDim);
+
+    fillMatrix(theInput);
+
+    layer::ConstInputLayer<double> theInputLayer(theInput);
+    layer::Layer<double>::TUniqueHandle theSoftMaxLayer(layer::Layer<double>::create(layer::SoftMaxLayer<double>::TYPE, layer::Layer<double>::TLayerConfig()));
+    theInputLayer.connect(*theSoftMaxLayer.get());
+    theSoftMaxLayer->setMode(ComputeModeEnum::GPU);
+
+    theSoftMaxLayer->forward();
+    const Matrix<double> *theOutput = theSoftMaxLayer->getOutput();
+    const Dimension &theOutputDim = theOutput->getDimension();
+
+    bool theIsFailed = false;
+    if (theOutputDim != Dimension(10)) {
+        theIsFailed = true;
+    } else {
+        utils::Matrix<double>::data_type theSum = 0;
+        for (int64_t w = 0, theWDim = theOutputDim.getW(); w < theWDim; ++w) {
+            for (int64_t z = 0, theZDim = theOutputDim.getZ(); z < theZDim; ++z) {
+                for (int64_t y = 0, theYDim = theOutputDim.getY(); y < theYDim; ++y) {
+                    for (int64_t x = 0, theXDim = theOutputDim.getX(); x < theXDim; ++x) {
+                        theSum += theOutput->getData()[theOutput->offset(x, y, z, w)];
+                    }
+                }
+            }
+        }
+        if (fabs(theSum - 1) >= 1e-6)
+            theIsFailed = true;
+    }
+
+    if (theIsFailed) {
+        std::cerr << "SoftMax.softMax1DGPU test failed:" << std::endl
+                  << "input:" << std::endl
+                  << theInput << std::endl
+                  << "output:" << std::endl
+                  << *theOutput << std::endl;
+    }
+
+    return true;
+}
+
+bool
+softMax2DGPU()
+{
+    const Dimension theInputDim(10, 15);
+
+    Matrix<double> theInput(theInputDim);
+
+    fillMatrix(theInput);
+
+    layer::ConstInputLayer<double> theInputLayer(theInput);
+    layer::Layer<double>::TUniqueHandle theSoftMaxLayer(layer::Layer<double>::create(layer::SoftMaxLayer<double>::TYPE, layer::Layer<double>::TLayerConfig()));
+    theInputLayer.connect(*theSoftMaxLayer.get());
+    theSoftMaxLayer->setMode(ComputeModeEnum::GPU);
+
+    theSoftMaxLayer->forward();
+    const Matrix<double> *theOutput = theSoftMaxLayer->getOutput();
+    const Dimension &theOutputDim = theOutput->getDimension();
+
+    bool theIsFailed = false;
+    if (theOutputDim != Dimension(10, 15)) {
+        theIsFailed = true;
+    } else {
+        utils::Matrix<double>::data_type theSum = 0;
+        for (int64_t w = 0, theWDim = theOutputDim.getW(); w < theWDim; ++w) {
+            for (int64_t z = 0, theZDim = theOutputDim.getZ(); z < theZDim; ++z) {
+                for (int64_t y = 0, theYDim = theOutputDim.getY(); y < theYDim; ++y) {
+                    for (int64_t x = 0, theXDim = theOutputDim.getX(); x < theXDim; ++x) {
+                        theSum += theOutput->getData()[theOutput->offset(x, y, z, w)];
+                    }
+                }
+            }
+        }
+        if (fabs(theSum - 1) >= 1e-6)
+            theIsFailed = true;
+    }
+
+    if (theIsFailed) {
+        std::cerr << "SoftMax.softMax2DGPU test failed:" << std::endl
+                  << "input:" << std::endl
+                  << theInput << std::endl
+                  << "output:" << std::endl
+                  << *theOutput << std::endl;
+    }
+
+    return true;
+}
+
 }
 
 namespace test
@@ -88,6 +228,9 @@ void
 SoftMaxLayerTests::run()
 {
     softMax1D();
+    softMax1DGPU();
+    softMax2D();
+    softMax2DGPU();
 }
 
 }
